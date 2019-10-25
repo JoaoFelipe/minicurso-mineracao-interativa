@@ -14,7 +14,7 @@ ENV PATH=$PATH:$HOME/anaconda3/bin
 RUN conda install conda
 RUN conda init
 RUN ["/bin/bash", "-c", ". /home/gitpod/anaconda3/etc/profile.d/conda.sh && conda activate base && pip install simplejson radon"]
-RUN ["/bin/bash", "-c", ". /home/gitpod/anaconda3/etc/profile.d/conda.sh && conda activate base && conda install -c conda-forge pygit2"]
+RUN ["/bin/bash", "-c", ". /home/gitpod/anaconda3/etc/profile.d/conda.sh && conda activate base && conda install --override-channels -c conda-forge pygit2 -y"]
 RUN echo "conda activate base" > ~/.bashrc
 ENV jupynb="jupyter notebook --NotebookApp.allow_origin=\'$(gp url 8888)\' --ip='*' --NotebookApp.token='' --NotebookApp.password=''"
 
