@@ -1,0 +1,1 @@
+{"allow_redirects": false, "cookies": {}, "data": "", "headers": {"Accept": "*/*", "Accept-Encoding": "gzip, deflate", "Connection": "keep-alive", "User-Agent": "python-requests/2.22.0"}, "method": "GET", "url": "https://github.com/gems-uff/sapos"}

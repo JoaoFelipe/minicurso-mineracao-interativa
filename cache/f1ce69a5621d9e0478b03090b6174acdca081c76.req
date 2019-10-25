@@ -1,0 +1,1 @@
+{"allow_redirects": false, "cookies": {}, "data": "", "headers": {"Accept": "*/*", "Accept-Encoding": "gzip, deflate", "Authorization": "token 84bbbb133401841c5343b538a65349f79012d24f", "Connection": "keep-alive", "User-Agent": "Minicurso"}, "method": "GET", "url": "https://api.github.com/repos/gems-uff/sapos/issues?page=6&state=closed"}
