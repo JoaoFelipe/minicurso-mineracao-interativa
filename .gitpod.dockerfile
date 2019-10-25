@@ -13,7 +13,6 @@ RUN rm Anaconda3-2019.10-Linux-x86_64.sh
 ENV PATH=$PATH:$HOME/anaconda3
 ENV PATH=$PATH:$HOME/anaconda3/bin
 RUN conda install conda
-RUN conda init
 RUN ["/bin/bash", "-c", ". /home/gitpod/anaconda3/etc/profile.d/conda.sh && conda activate base && pip install simplejson radon"]
 RUN ["/bin/bash", "-c", ". /home/gitpod/anaconda3/etc/profile.d/conda.sh && conda activate base && conda install -c conda-forge pygit2 -y"]
 RUN conda init bash
