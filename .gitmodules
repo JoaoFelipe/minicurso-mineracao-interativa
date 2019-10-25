@@ -1,0 +1,3 @@
+[submodule "sapos"]
+	path = sapos
+	url = https://github.com/gems-uff/sapos.git
