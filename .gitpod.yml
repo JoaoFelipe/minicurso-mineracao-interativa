@@ -6,4 +6,5 @@ ports:
 - port: 5000
   onOpen: notify
 tasks:
+- command: conda init
 - command: conda activate base
