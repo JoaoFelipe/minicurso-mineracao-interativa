@@ -16,7 +16,7 @@ function scrollToSelected() {
     cell.focus_cell();
 }
 
-function selectCell(index) {
+function selectCell(index, execute) {
     var cells = IPython.notebook.get_cells();
     IPython.notebook.select(index);
     var cell = IPython.notebook.get_selected_cell();
@@ -24,7 +24,7 @@ function selectCell(index) {
 
     var rx = /# skip-execution/g;
     var match = rx.exec(cell.get_text());
-    if (cell.cell_type == "code" && match == undefined) {
+    if (cell.cell_type == "code" && match == undefined && execute) {
         cell.execute();
     }
     
@@ -73,16 +73,37 @@ function selectCell(index) {
 }
 
 
+function startSlideMode(found) {
+    var cells = IPython.notebook.get_cells();
+    var i = 0;
+    for (var cell of cells) {
+        cell.element.toggle(false);
+    }
+    for (i = 0; i <= found; i++) {
+        var cell = cells[i];
+        cell.element.toggle(true);
+    }
+    var cell = cells[cells.length - 1];
+    cell.element.toggle(true);
+
+    $(".navbar-nav").toggle(false);
+    $("#slide-top").remove();
+    $(".navbar-collapse").append("<div id='slide-top' style='padding: 6px 20px; text-align: center;'></div>")
+    $("#slide-top").append("<div  style='float: left;' id='current-slide'>1</div>")
+    $("#slide-top").append("<div style='display: inline-block; padding: 0 20px;' id='current-title'>"+ TITLE_PREFIX +"</div>")
+    $("#slide-top").append("<div style='display: inline-block; padding: 0 20px; float: right;' id='current-name'>João Felipe Pimentel</div>")
+    selectCell(found, false);
+    document.documentElement.requestFullscreen();
+}
+
 var hide = {
     icon: 'fa-eye-slash',
     help    : 'Hide all',
     help_index : 'zz',
     handler : function () {
-        var cells = IPython.notebook.get_cells();
         var found = 0;
         var i = 0;
         for (var cell of IPython.notebook.get_cells()) {
-            cell.element.toggle(false);
             var rx = /<span class=\"notebook-slide-start\"\/>/g;
             var match = rx.exec(cell.get_text());
             if (match) {
@@ -90,23 +111,19 @@ var hide = {
             }
             i += 1;
         }
-        for (i = 0; i <= found; i++) {
-            var cell = cells[i];
-            cell.element.toggle(true);   
-        }
-        var cell = cells[cells.length - 1];
-        cell.element.toggle(true);
-        
-        $(".navbar-nav").toggle(false);
-        $("#slide-top").remove();
-        $(".navbar-collapse").append("<div id='slide-top' style='padding: 6px 20px; text-align: center;'></div>")
-        $("#slide-top").append("<div  style='float: left;' id='current-slide'>1</div>")
-        $("#slide-top").append("<div style='display: inline-block; padding: 0 20px;' id='current-title'>"+ TITLE_PREFIX +"</div>")
-        $("#slide-top").append("<div style='display: inline-block; padding: 0 20px; float: right;' id='current-name'>João Felipe Pimentel</div>")
-        selectCell(found);
-        document.documentElement.requestFullscreen();
+        startSlideMode(found);
     }
 };
+
+var startCurrent = {
+    icon: 'fa-eye-slash',
+    help    : 'Start slide mode at current cell',
+    help_index : 'zz',
+    handler : function () {
+        startSlideMode(IPython.notebook.get_selected_index());
+    }
+};
+
 var show = {
     icon: 'fa-eye',
     help    : 'Show all',
@@ -126,7 +143,11 @@ var view = {
     help    : 'Show cell',
     help_index : 'zz',
     handler : function () {
-        selectCell(IPython.notebook.get_selected_index());
+        var index = IPython.notebook.get_selected_index();
+        selectCell(index, false);
+        IPython.notebook.select(index);
+        IPython.notebook.get_selected_cell().element.toggle(true);
+        scrollToSelected();
     }
 };
 
@@ -138,7 +159,9 @@ var previous = {
         var cell = IPython.notebook.get_selected_cell();
         cell.element.toggle(false);
         var index = IPython.notebook.get_selected_index();
-        selectCell(index - 1);
+        if (cell.cell_type == "markdown") {
+            selectCell(index - 1, false);
+        }
         IPython.notebook.select(index - 1);
         IPython.notebook.get_selected_cell().element.toggle(true);
         scrollToSelected();
@@ -149,21 +172,21 @@ var next = {
     help    : 'Previous slide',
     help_index : 'zz',
     handler : function () {
-        
         var index = IPython.notebook.get_selected_index();
-        selectCell(index + 1);
-        
+        selectCell(index + 1, false);
     }
 };
 var prefix = 'slide-notebook';
 var actions = Jupyter.actions
 
 IPython.notebook.keyboard_manager.command_shortcuts.add_shortcut(
-    '[', actions.register(previous, 'previous-slide', prefix)
+    '[,[', actions.register(previous, 'previous-slide', prefix)
 )
+
 IPython.notebook.keyboard_manager.command_shortcuts.add_shortcut(
     ']', actions.register(next, 'next-slide', prefix)
 )
+
 IPython.notebook.keyboard_manager.command_shortcuts.add_shortcut(
     '-', actions.register(hide, 'hide-all', prefix)
 )
@@ -171,7 +194,10 @@ IPython.notebook.keyboard_manager.command_shortcuts.add_shortcut(
     '=', actions.register(show, 'show-all', prefix)
 )
 IPython.notebook.keyboard_manager.command_shortcuts.add_shortcut(
-    '0', actions.register(view, 'show-cell', prefix)
+    '[,]', actions.register(view, 'show-cell', prefix)
+)
+IPython.notebook.keyboard_manager.command_shortcuts.add_shortcut(
+    '0', actions.register(startCurrent, 'start-current', prefix)
 )
 """
 
